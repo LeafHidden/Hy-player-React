@@ -1,0 +1,33 @@
+.login-container{
+    :global{
+        .login-header{
+            display: flex;
+            justify-content: space-between;
+            padding: 0 25px;
+            font-size: 25px;
+            padding-top: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            >div{
+                cursor: pointer;
+            }
+            i{
+                position: absolute;
+                display: inline-block;
+                width: 100px;
+                height: 2px;
+                bottom: -15px;
+                // left: 25px;
+                transition: 0.5s;
+                border-radius: 10px;
+                background: #68bcff;
+            }
+        }
+        .login-form{
+            text-align: center;
+            .semi-form-field{
+                height: 80px;
+            }
+        }
+    }
+}

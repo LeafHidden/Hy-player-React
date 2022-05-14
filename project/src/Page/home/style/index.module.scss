@@ -1,0 +1,108 @@
+.container {
+    >div:nth-child(1) {
+        padding: 10px;
+    }
+
+    :global {
+        .header {
+            >h1 {
+                margin      : 20px 0;
+                color       : #fff;
+                font-size   : 40px;
+                padding-left: 30px;
+            }
+        }
+
+        .verseTitle {
+            color: #fff;
+
+            padding: 25px 10px;
+
+            background     : linear-gradient(-90deg, #54b3ff 0%, #2d74e0 100%);
+            border-radius  : 10px;
+            display        : flex;
+            justify-content: space-between;
+       
+            .verseTitle-left {
+                h1 {
+                    font-size: 40px;
+                }
+
+                span {
+                    font-family: cursive;
+                }
+            }
+
+            .verseTitle-right {
+                display: flex;
+                position: relative;
+                padding-right: 250px;
+                >button {
+                    display       : flex;
+                    flex-direction: column;
+                    align-items   : center;
+                    color         : #3487c9;
+                    background    : #f6fbff;
+                    border-radius : 15px;
+                    padding       : 15px 18px;
+                    margin-left: 25px;
+                    transition:all 0.2s cubic-bezier(.55,.06,.68,.19) 0s;
+                    box-shadow: 0 2px #00000004;
+                    position: relative;
+                    border: none;
+                
+                    i{
+                        font-size: 40px;
+                    }
+                    span{
+                        font-size: 13px;
+                        font-weight: 600;
+                        display: inline-block;
+                    }
+                    &:hover{
+                        background: #54b3ff;
+                    }
+              
+                    &::after{
+                        content: '';
+                        position: absolute;
+                        inset: 0;
+                        border-radius: inherit;
+                        box-shadow:0 0 0 10px #43438f;
+                        opacity: 0;
+                        transition: .4s;
+                    }
+                    &:active{
+                        filter: brightness(.9);
+                    }
+                    &:active::after{
+                        transition: 0s;
+                        box-shadow: none;
+                        opacity: 0.4;
+                    }
+            
+                }
+                
+                
+                >img {
+                    position: absolute;
+                    width: 240px;
+                    /* height: 201px; */
+                    right: -3px;
+                    top: -202px;
+                }
+
+            }
+
+      
+
+        }
+        .login-title{
+            text-align: center;
+            font-size: 33px;
+            color: #fff;
+        }
+
+
+    }
+}

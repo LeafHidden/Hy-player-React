@@ -1,0 +1,94 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    list-style: none;
+    font-family: auto ;
+}
+html{
+    height: 100%;
+}
+body{
+    height: 100%;
+    
+}
+#root{
+    height: 100%;
+}
+.Layout{
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+}
+.flex{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.Layout::after{
+    content: '';
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+
+    background-size: 100% 100%;
+    background: linear-gradient(to bottom, #323232 0%, #3F3F3F 40%, #1C1C1C 150%), linear-gradient(to top, rgba(255,255,255,0.40) 0%, rgba(0,0,0,0.25) 200%);
+    background-blend-mode: multiply;
+    top: 0;
+    z-index: -5;
+
+}
+.Background-board{
+
+    position: relative;
+    margin-top: 32px;
+
+    overflow: hidden;
+    width: 100%;
+    border-radius: 5px;
+}
+.Background-board>div{
+    height: 100%;
+}
+.Background-board::after{
+    content: '';
+    width: 100%;
+    z-index: 0;
+    height: 100%;
+    background: inherit;
+    box-shadow: 0 0 0 2px rgb(195 195 195 / 80%);
+    position: absolute;
+    top: 0;
+    background-color: rgb(68 68 68 / 50%);
+    opacity: 0.5;
+    /* filter: blur(0px); */
+    z-index: -4;
+}
+
+.Personalized-con::after{
+    content: '';
+    width: 100%;
+    z-index: 0;
+    height: 100%;
+    background: inherit;
+    position: absolute;
+    top: 0;
+
+    background-color: rgb(102 102 102 / 50%);
+    box-shadow: 0 0 0 2px rgb(89 89 89 / 80%);
+    opacity: 0.5;
+  
+    z-index: -3;
+    border-radius: 5px;
+}
+@media screen and (max-height:500px) {
+    .setup {
+        border-top: 1px solid #9d9a9a !important;
+      }
+}
+@media screen and (max-width:800px) {
+
+}
+
