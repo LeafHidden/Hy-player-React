@@ -6,7 +6,7 @@ import Personal from './Personal/index';
 import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import './animations.css'
 import RecommendedDaily from './Page/recommendedDaily/index'
-import {Play} from './Play/index'
+import Play from './Play/index'
 // .fade-appear    // 初次进入前的状态, 注意在初次进入时，appear和 enter 相关的类名会在第一次动画时同时生效
 // .fade-appear-active    // 初次进入中的状态
 // .fade-appear-done    // 初次进入后的状态

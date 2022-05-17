@@ -34,9 +34,30 @@
             height     : calc(100vh - 120px);
             padding-top: 50px;
             min-height : 600px;
+            overflow: hidden;
+            .lyrics-wraper{
+                height: 100%;
+            }
+            >div{
+                height: 100%;
+                >div{
+                    height: 100%;
+                    >div{
+                        height: 100%;
+                        >div{
+                            height: 100%;
+                       
+                        }     >div{
+                            height: 100%;
+                       
+                        }
+                   
+                    }    
+                }
+            }
         }
 
-        .Single {
+        .SinglePlay {
 
 
             .nav {
@@ -78,7 +99,9 @@
         }
 
         .play-left {
-            display: flex;
+            >div{
+                display: flex;
+            }
 
             img {
                 width        : 110px;
@@ -90,7 +113,8 @@
                 padding-top: 3px;
 
                 h1 {
-                    font-size: 22px
+                    font-size: 22px;
+                    margin-bottom: 25px;
                 }
 
                 >div {

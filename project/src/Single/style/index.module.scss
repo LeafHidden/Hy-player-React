@@ -1,5 +1,15 @@
 .Single{
     :global{
-        
+        .lyrics-wraper{
+            overflow: hidden;
+        }
+   
+        ul{
+         line-height: 35px;
+
+         li{
+             letter-spacing: 2px;
+         }
+        }
     }
 }

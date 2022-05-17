@@ -1,8 +1,8 @@
 import  React  from 'react';
-import {  Modal,Form, } from '@douyinfe/semi-ui';
+import {  Modal,Form,Toast } from '@douyinfe/semi-ui';
 import   './button.scss'
 import style from './index.module.scss'
-// import  MD5  from"react-native-md5";
+import  MD5  from"react-native-md5";
 export default class Login extends  React.Component{
     constructor(props){
         super(props)
@@ -143,7 +143,7 @@ export default class Login extends  React.Component{
         //     window.$http.getPhone(data).then(res=>{
 
         //      if(res.data.code===200){
-  
+        //         console.log(res.data);
         //       Toast.success({
         //         content: `登录成功`,
         //         duration: 2,

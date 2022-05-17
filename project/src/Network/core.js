@@ -41,6 +41,10 @@ const APIClient = {
     // 获取歌词
     getLyric(params){
         return request(METHOD.POST,`/lyric?${qs.stringify(params)}`,)
+    },
+    // 获取歌曲
+    getSongUrl(params){
+        return  request(METHOD.POST,`/song/url?${qs.stringify(params)}`,)
     }
 
 };
