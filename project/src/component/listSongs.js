@@ -13,12 +13,15 @@ export const ListSongs = (props) => {
           urlFn(props.data.list[0].al.picUrl)
         }
       },[props]);
-
+      
+    // 点击调用播放事件  
     const songDetail=(val,index)=>{
         currindexFn(index)
         window.$http.getSongUrl({id:val.privilege.id}).then(res=>{
-
-            window.PubSub.publish("songDetail",{song:res.data.data[0],avatar:val})
+            // if(currindex!==index){
+                window.PubSub.publish("songDetail",{song:res.data.data[0],avatar:val})
+            // }
+            
         })
     }
 
@@ -60,7 +63,7 @@ export const ListSongs = (props) => {
                                     key={item.id} 
                                     scrollableParentSelector=".style_listSongs__irXcU"
                                     >
-                                        <div className={['list-item flex',currindex===index?'list-item-foucs':''].join(' ')}  onClick={()=>{songDetail(item,index)}}>
+                                        <div className={['list-item flex',currindex===index?'list-item-foucs':''].join(' ')}  onClick={()=>songDetail(item,index)}>
                                             <div className='item-left '>
                                                 <img src={item.al.picUrl} alt='' />
 

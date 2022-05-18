@@ -8,21 +8,17 @@ export const Single = (props) => {
     const lyricData = []
     useEffect(() => {
         const wrapper = document.querySelector(`.lyrics-wraper`)
-        window.$http.getLyric({
-            id: '33894312',
-        }).then(res => {
-            formatLyric(res.data.lrc.lyric)
-            lyricListFn(lyricData)
-        })
-      
-        setTimeout(()=>{
+        console.log(props);
+        formatLyric(props.lyric)
+        lyricListFn(lyricData)
+        setTimeout(() => {
             new BScroll(wrapper, {
                 scrollY: true,  //开启横向滚动
                 click: true,  // better-scroll 默认会阻止浏览器的原生 click 事件
                 mouseWheel: true,
             })
-        },10)
-   
+        }, 10)
+
     }, [])
 
 
@@ -67,22 +63,26 @@ export const Single = (props) => {
                     <div className="nav-left">
                         {/* 封面 */}
                         <div className="cover">
-                            <img src="http://p3.music.126.net/71YQw1K88LS06iMjLRY5CA==/18610333812708195.jpg" alt="" />
-                            <div className="title">
-                                <h1>克林</h1>
-                                <div>
-                                    <span>歌手：</span>
-                                    <span>零件</span>
+                        {/*  */}
+                            <img src={props.avatar.al.picUrl||"http://p3.music.126.net/71YQw1K88LS06iMjLRY5CA==/18610333812708195.jpg"} alt="" />
+                            {
+                                props.avatar&&<div className="title">
+                                    <h1>{props.avatar.name}</h1>
+                                    <div>
+                                        <span>歌手：</span>
+                                        <span>{props.avatar.ar[0].name}</span>
+                                    </div>
+                                    <div>
+                                        <span>专辑：</span>
+                                        <span>{props.avatar.al.name}</span>
+                                    </div>
                                 </div>
-                                <div>
-                                    <span>专辑：</span>
-                                    <span>偶然黄昏见</span>
-                                </div>
-                            </div>
+                            }
+
                         </div>
                     </div>
                     <div className="nav-right">
-                
+
                         <div className="lyrics lyrics-wraper">
                             <ul className="list">
                                 {
@@ -95,7 +95,7 @@ export const Single = (props) => {
                                 <li></li>
                             </ul>
                         </div>
-                 
+
 
                     </div>
                 </div>

@@ -11,6 +11,7 @@
         "better-scroll": "^2.4.2",
         "pubsub-js": "^1.9.4",
         "qs": "^6.10.3",
+        "rc-slider": "^10.0.0",
         "react": "^17.0.2",
         "react-animations": "^1.0.0",
         "react-dom": "^17.0.2",
