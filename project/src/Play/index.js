@@ -2,7 +2,7 @@
 import React from 'react'
 import style from './style/index.module.scss'
 
-// import { Slider } from '@douyinfe/semi-ui';
+
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 // import { useNavigate } from 'react-router-dom'
@@ -14,7 +14,15 @@ import { Header } from './child'
 
 
 
-
+function debounce (fn, ms) {
+    let timeoutId
+    return function () {
+        clearTimeout(timeoutId)
+        timeoutId = setTimeout(() => {
+            fn.apply(this, arguments)
+        }, ms)
+    }
+}
 
 export default class Play extends React.Component {
 
@@ -30,7 +38,7 @@ export default class Play extends React.Component {
             valueSlider: 10,
             startTime: '00:00',
             // 当前audio播放时段
-            currentTime:'',
+            currentTime: '',
             time: null,
             leftValue: 0,
             songData: {
@@ -40,24 +48,25 @@ export default class Play extends React.Component {
                 layricId: '',
 
             },
-
         }
+        this.Single=React.createRef()
         this.audio = null
         this.setAudio = element => {
             this.audio = element;
-
         }
+        this.sliderOnchange = debounce(this.sliderOnchange, 3000)
     }
 
     // 打开播放页面
     open = () => {
+        // 关闭
         if (this.state.visible) {
             this.setState({ animate: fadeOutDown })
-
             setTimeout(() => {
                 this.setState(state => ({ visible: !state.visible }))
             }, 1000)
         } else {
+            // 打开
             window.$http.getLyric({
                 id: this.state.songData.layricId,
             }).then(res => {
@@ -66,7 +75,9 @@ export default class Play extends React.Component {
                     animate: fadeInUp,
                     lyric: res.data.lrc.lyric
                 }))
+              
             })
+          
         }
     }
 
@@ -83,77 +94,78 @@ export default class Play extends React.Component {
     }
 
     // 滑块开始
-    playTime = (val) => {
-        
-        if(this.state.leftValue<=this.state.valueSlider){
-            this.time = setInterval(() => {
-                if (this.audio && this.audio.currentTime) {
-                    let songTime = moment.duration(this.audio.currentTime, 'seconds')
-                    let minutes = songTime.minutes()
-                    let seconds = songTime.seconds()
-                    this.setState({
-                        startTime: moment({ m: minutes, s: seconds }).format('mm:ss'),
-                        leftValue: this.state.leftValue + 1
-                    });
-                }
-            }, 1000)
-        }else{
-            // 关闭定时器
-            clearInterval(this.time)
-            this.play(true)
-     
-        }
-          
-        
+    playTime = () => {
+        this.time = setInterval(() => {
+            if (this.state.leftValue < this.state.valueSlider) {
+                let songTime = moment.duration(this.audio.currentTime, 'seconds')
+                let minutes = songTime.minutes()
+                let seconds = songTime.seconds()
+                this.setState({
+                    startTime: moment({ m: minutes, s: seconds }).format('mm:ss'),
+                    leftValue: this.state.leftValue + 1
+                });
+            } else {
+                  // 关闭定时器
+                this.setState({
+                    playState: true,
+
+                })
+                this.play()
+            }
+
+        }, 1000)
     }
     // 关闭滑块
-    endTime=()=>{
+    endTime = () => {
         clearInterval(this.time)
         this.setState({
-            startTime:'00:00',
-            leftValue: 0  
+            startTime: '00:00',
+            leftValue: 0
         })
     }
 
     // 播放
     play = (val) => {
-       
         try {
-            if (this.audio||val) {
-                if (this.state.playState) {
-                    this.audio.pause()
+            if (this.state.playState) {
+                // 暂停
+                this.audio.pause()
+                clearInterval(this.time)
+                this.time = null
+                this.setState({
+                    playState: false
+                })
+            } else {
+                // 判断当前歌曲是否已经播放完毕
+                if(this.state.leftValue>this.state.valueSlider){
                     this.setState({
-                        playState: false
-                    })
-                } else {
-                    this.audio.play()
-                    this.playTime(this.audio.currentTime)
-                    this.setState({
-                        playState: true
+                        startTime: '00:00',
+                        leftValue: 0
                     })
                 }
+                this.audio.play()
+                // 开启滑块
+                this.playTime()
+                this.setState({
+                    playState: true
+                })
+      
             }
+
         } catch (e) {
             console.log(e);
         }
-
-
     }
-    // 
+     // 订阅点击歌曲事件
     componentDidMount () {
-        // 订阅点击歌曲事件
+    
         window.PubSub.subscribe("songDetail", (msg, data) => {
 
-                setTimeout(()=>{
-                    if (this.audio && this.audio.duration) {
-  
-                        this.setState({
-                            valueSlider: this.audio.duration
-                        })
-                    }
-                },100)
-        
-
+            this.audio.addEventListener('canplay', () => {
+                this.setState({
+                    valueSlider: this.audio.duration
+                })
+            })
             this.endTime()
             let songData = Object.assign({}, this.state.songData, {
                 url: data.song.url,
@@ -172,19 +184,33 @@ export default class Play extends React.Component {
     }
     // 滑块change事件
     sliderOnchange = (val) => {
-        // let songTime = moment.duration(val, 'seconds')
-        // let minutes = songTime.minutes()
-        // let seconds = songTime.seconds()
-        // this.setState({
-        //     startTime: moment({ m: minutes, s: seconds }).format('mm:ss'),
-        //     leftValue: val
-        // });
-        // this.audio.currentTime=val
-    
+        this.audio.currentTime = val
+        this.setState({
+            leftValue: val
+        });
     }
+    // 
+    timeUpdate=()=>{
+      
+        //lyricList: [],// 歌词数组
+        //currentTime: '',// audio当前播放时间
+        //currentLyc: 0, // 当前歌词
+        //lycStyle: {}// 歌词滚动样式
+          	// 获取audio当前播放时间
+    // let currentTime = this.format(document.getElementsByTagName('audio')[0]['currentTime']); // 事件转换
+    // let { currentLyc, lyricList } = this.state
+    // for (let i=0; i < lyricList.length; i++) {
+    //   if (lyricList[i + 1] && this.audio.currentTime < lyricList[i + 1]['time'] && this.audio.currentTime > lyricList[i]['time']) {
+    //     this.setState({
+    //       currentLyc: i,
+    //       lycStyle: {
+    //         transform: `translateY(-${0.545 * i}rem)`
+    //       }
+    //     })
+    //   }
+    // }
 
-
-
+    }
     // 歌词
     layric = () => {
 
@@ -201,7 +227,7 @@ export default class Play extends React.Component {
                         {
                             this.state.visible &&
                             <Header css={keyframes`${this.state.animate}`}>
-                                <Single time={1000} lyric={this.state.lyric} avatar={this.state.avatar}></Single>
+                                <Single ref={this.Single} time={1000} lyric={this.state.lyric} avatar={this.state.avatar}></Single>
                             </Header>
                         }
                     </div>
@@ -243,7 +269,13 @@ export default class Play extends React.Component {
                             <div className='play-bottom flex'>
                                 <span>{this.state.startTime}</span>
 
-                                <Slider min={0} max={this.state.valueSlider} value={this.state.leftValue} onChange={this.sliderOnchange}></Slider>
+                                <Slider
+                                    min={0} max={this.state.valueSlider}
+                                    step={1}
+                                    value={this.state.leftValue}
+                                    onChange={this.sliderOnchange}>
+
+                                </Slider>
                                 <span>{this.state.songData.endTime}</span>
                             </div>
                         </div>
@@ -269,6 +301,7 @@ export default class Play extends React.Component {
                 <audio
                     ref={this.setAudio}
                     src={this.state.songData.url}
+                    onTimeUpdate={(e) => { this.timeUpdate(e) }}
                 >
                 </audio>
             </div>

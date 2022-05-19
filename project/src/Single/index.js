@@ -2,15 +2,20 @@
 
 import style from "./style/index.module.scss"
 import BScroll from 'better-scroll'
-import { useState, useEffect } from "react"
-export const Single = (props) => {
+import { useState, useEffect,forwardRef,useImperativeHandle} from "react"
+
+
+  
+
+export const Single = forwardRef((props,ref) => {
     const [lyricList, lyricListFn] = useState([])
     const lyricData = []
+   
     useEffect(() => {
         const wrapper = document.querySelector(`.lyrics-wraper`)
-        console.log(props);
         formatLyric(props.lyric)
         lyricListFn(lyricData)
+   
         setTimeout(() => {
             new BScroll(wrapper, {
                 scrollY: true,  //开启横向滚动
@@ -20,7 +25,8 @@ export const Single = (props) => {
         }, 10)
 
     }, [])
-
+   
+    useImperativeHandle(ref, () => lyricList)
 
 
     // 格式化歌词的时间
@@ -45,7 +51,6 @@ export const Single = (props) => {
             if (item === '') return
             const obj = {}
             const time = item.match(regTime)
-
             // 获取歌词
             obj.lyric = item.split(']')[1].trim() === '' ? '' : item.split(']')[1].trim()
             // 转换时间
@@ -57,7 +62,7 @@ export const Single = (props) => {
         })
     }
     return (
-        <div className={style["Single"]}>
+        <div className={style["Single"]} ref={ref}>
             <div className="container">
                 <div className="nav">
                     <div className="nav-left">
@@ -103,4 +108,4 @@ export const Single = (props) => {
             </div>
         </div>
     )
-}
+})
