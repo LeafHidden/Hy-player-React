@@ -5,11 +5,18 @@
         }
    
         ul{
-         line-height: 35px;
+         line-height: 50px;
+         height: 200%;
 
          li{
              letter-spacing: 2px;
          }
+        }
+        .active{
+            color: #ff5d5d;
+            /* transform: scale(1.5); */
+            transition: 0.3s linear;
+            font-size: 18px;
         }
     }
 }

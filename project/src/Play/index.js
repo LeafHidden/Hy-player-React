@@ -23,9 +23,22 @@ function debounce (fn, ms) {
         }, ms)
     }
 }
+function throttle(fn, ms) {
+	let timerId // 创建一个标记用来存放定时器的id
+	return function () {
+		// 没有定时器等待执行，则表示可以创建新的定时器来执行函数
+		if (!timerId) {
+			timerId = setTimeout(() => {
+				// 定时器id清空，表示可以执行下一次调用了
+				timerId = null
+				fn.apply(this, arguments)
+			}, ms)
+		}
+	}
+}
 
+let arrTime=[]
 export default class Play extends React.Component {
-
     // let navigate = useNavigate()
     constructor() {
         super();
@@ -33,10 +46,13 @@ export default class Play extends React.Component {
             visible: false,
             animate: fadeInUp,
             playState: false,
-            lyric: '',
+            lyric: [],
             avatar: {},
             valueSlider: 10,
             startTime: '00:00',
+            // 当前歌词
+            currentLyc:'',
+            // 
             // 当前audio播放时段
             currentTime: '',
             time: null,
@@ -57,6 +73,46 @@ export default class Play extends React.Component {
         this.sliderOnchange = debounce(this.sliderOnchange, 3000)
     }
 
+    
+    // 格式化歌词的时间
+     formatLyricTime = (time) => {
+        const regMin = /.*:/
+        const regSec = /:.*\./
+        const regMs = /\./
+
+        const min = parseInt(time.match(regMin)[0].slice(0, 2))
+        let sec = parseInt(time.match(regSec)[0].slice(1, 3))
+        const ms = time.slice(time.match(regMs).index + 1, time.match(regMs).index + 3)
+        if (min !== 0) {
+            sec += min * 60
+        }
+        return Number(sec + '.' + ms)
+    }
+
+    // 格式化歌词
+        async formatLyric(text){
+        let arr = text.split('\n')
+        const regTime = /\[\d{2}:\d{2}.\d{2,3}\]/
+        const lyricData=[]
+        return new Promise((resolve, reject)=>{
+            arr.forEach(item => {
+                if (item === '') return
+                const obj = {}
+                const time = item.match(regTime)
+                // 获取歌词
+                obj.lyric = item.split(']')[1].trim() === '' ? '' : item.split(']')[1].trim()
+                // 转换时间
+                obj.time = time ? this.formatLyricTime(time[0].slice(1, time[0].length - 1)) : 0
+                obj.key = Math.random().toString().slice(-6)
+                if (obj.lyric !== '') {
+                    lyricData.push(obj)
+                }
+            })
+            resolve(lyricData)
+        })
+    }
+
+
     // 打开播放页面
     open = () => {
         // 关闭
@@ -69,11 +125,12 @@ export default class Play extends React.Component {
             // 打开
             window.$http.getLyric({
                 id: this.state.songData.layricId,
-            }).then(res => {
+            }).then(async res => {
+               let data=await this.formatLyric(res.data.lrc.lyric)
                 this.setState(state => ({
                     visible: !state.visible,
                     animate: fadeInUp,
-                    lyric: res.data.lrc.lyric
+                    lyric: data
                 }))
               
             })
@@ -81,7 +138,7 @@ export default class Play extends React.Component {
         }
     }
 
-
+    // 转换网易云歌词时间格式
     formatDt = (time) => {
         let dt = time / 1000;
         let m = parseInt(dt / 60)
@@ -158,7 +215,7 @@ export default class Play extends React.Component {
     }
      // 订阅点击歌曲事件
     componentDidMount () {
-    
+
         window.PubSub.subscribe("songDetail", (msg, data) => {
 
             this.audio.addEventListener('canplay', () => {
@@ -189,26 +246,41 @@ export default class Play extends React.Component {
             leftValue: val
         });
     }
-    // 
-    timeUpdate=()=>{
+    // 转换audio时间格式
+    format=(time)=>{
+        let songTime = moment.duration(time, 'seconds')
+        let minutes = songTime.minutes()
+        let seconds = songTime.seconds()
+        return moment({ m: minutes, s: seconds }).format('mm:ss')
+    }
+  
+    logFn=(val)=>{
+        if(arrTime.indexOf(val)===-1){
+            arrTime.push(val)
+            if(val>6){
+                this.Single.current.ref.scrollTo(0,(val-5)*-50, 300, undefined, {})
+            }
+            
+            this.setState((state=>({currentLyc:val})))
+
+        }
+     
       
-        //lyricList: [],// 歌词数组
-        //currentTime: '',// audio当前播放时间
-        //currentLyc: 0, // 当前歌词
-        //lycStyle: {}// 歌词滚动样式
-          	// 获取audio当前播放时间
-    // let currentTime = this.format(document.getElementsByTagName('audio')[0]['currentTime']); // 事件转换
-    // let { currentLyc, lyricList } = this.state
-    // for (let i=0; i < lyricList.length; i++) {
-    //   if (lyricList[i + 1] && this.audio.currentTime < lyricList[i + 1]['time'] && this.audio.currentTime > lyricList[i]['time']) {
-    //     this.setState({
-    //       currentLyc: i,
-    //       lycStyle: {
-    //         transform: `translateY(-${0.545 * i}rem)`
-    //       }
-    //     })
-    //   }
-    // }
+ 
+    }
+
+    timeUpdate=()=>{  
+    let currentTime = this.audio.currentTime // 事件转换
+    let {  lyric } = this.state
+
+    for (let i=0; i < lyric.length; i++) {
+      if (lyric[i + 1] && currentTime < lyric[i + 1]['time'] && currentTime > lyric[i]['time']) {
+        this.logFn(i)
+    
+
+
+      }
+    }
 
     }
     // 歌词
@@ -227,7 +299,13 @@ export default class Play extends React.Component {
                         {
                             this.state.visible &&
                             <Header css={keyframes`${this.state.animate}`}>
-                                <Single ref={this.Single} time={1000} lyric={this.state.lyric} avatar={this.state.avatar}></Single>
+                                <Single 
+                                ref={this.Single} 
+                                time={1000} 
+                                lyric={this.state.lyric} 
+                                avatar={this.state.avatar}
+                                currindex={this.state.currentLyc}
+                                ></Single>
                             </Header>
                         }
                     </div>
